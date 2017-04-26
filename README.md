@@ -14,7 +14,11 @@ generate pidstat step:
 add pidstat mpstat iostat tool for Android 6.0
 
 adb remount
+
 adb push pidstat /system/bin
+
 adb push mpstat  /system/bin
+
 adb push iostat  /system/bin
+
 adb reboot
