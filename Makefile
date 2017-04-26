@@ -7,23 +7,31 @@ NDK_SYSROOT=${SRC_DIR}/tools/ndk
 CFLAGS = -g -O2 -Wall -Wstrict-prototypes -pipe -O2 
 CFLAGS += --sysroot=${NDK_SYSROOT}
 CFLAGS += -pie -fPIE
-pidstat: pidstat.o librdstats_light.a libsyscom.a
-	@$(CC) pidstat.o libsyscom.a librdstats_light.a -o $@ $(CFLAGS)
+ALL: pidstat mpstat iostat
 commom.o: common.c version.h common.h ioconf.h sysconfig.h
-	@$(CC) -o $@ -c $(CFLAGS) $<
+	$(CC) -o $@ -c $(CFLAGS) $<
 ioconf.o: ioconf.c ioconf.h common.h sysconfig.h
-	@$(CC) -o $@ -c $(CFLAGS) $<
+	$(CC) -o $@ -c $(CFLAGS) $<
 rd_stats_light.o: rd_stats.c common.h rd_stats.h ioconf.h sysconfig.h
-	@$(CC) -o $@ -c $(CFLAGS) $<
+	$(CC) -o $@ -c $(CFLAGS) $<
 count_light.o: count.c common.h rd_stats.h
-	@$(CC) -o $@ -c $(CFLAGS) $<
+	$(CC) -o $@ -c $(CFLAGS) $<
 libsyscom.a: common.o ioconf.o
-	@$(AR) rvs $@ $?
+	$(AR) rvs $@ $?
 librdstats_light.a: rd_stats_light.o count_light.o
-	@$(AR) rvs $@ $? 
-
+	$(AR) rvs $@ $? 
 pidstat.o: pidstat.c pidstat.h version.h common.h rd_stats.h count.h
-	@$(CC) -o $@ -c $(CFLAGS) $<
+	$(CC) -o $@ -c $(CFLAGS) $<
+mpstat.o: mpstat.c mpstat.h version.h common.h rd_stats.h count.h
+	$(CC) -o $@ -c $(CFLAGS) $<
+iostat.o: iostat.c iostat.h version.h common.h ioconf.h sysconfig.h rd_stats.h count.h
+	$(CC) -o $@ -c $(CFLAGS) $<
+pidstat: pidstat.o librdstats_light.a libsyscom.a
+	$(CC) pidstat.o libsyscom.a librdstats_light.a -o $@ $(CFLAGS)
+mpstat: mpstat.o librdstats_light.a libsyscom.a
+	$(CC) mpstat.o libsyscom.a librdstats_light.a -o $@ $(CFLAGS)
+iostat: iostat.o librdstats_light.a libsyscom.a
+	$(CC) iostat.o libsyscom.a librdstats_light.a -o $@ $(CFLAGS)
 .PHONY: clean
 clean:
-	rm *.o *.a pidstat
+	rm -f *.o *.a pidstat mpstat iostat
